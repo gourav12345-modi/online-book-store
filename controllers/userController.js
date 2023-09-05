@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 // Function to register a new user
-async function register(req, res) {
+async function register(req, res, next) {
   try {
     const { username, password } = req.body;
 
@@ -23,13 +23,12 @@ async function register(req, res) {
 
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
-    console.error('Error in user registration:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    next(error)
   }
 }
 
 // Function to log in a user and generate a JWT token
-async function login(req, res) {
+async function login(req, res, next) {
   try {
     const { username, password } = req.body;
 
@@ -52,8 +51,7 @@ async function login(req, res) {
 
     res.status(200).json({ token });
   } catch (error) {
-    console.error('Error in user login:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    next(error)
   }
 }
 

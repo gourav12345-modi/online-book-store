@@ -6,11 +6,12 @@ const swaggerSpec = require('./docs/swaggerConfig');
 const swaggerUi = require("swagger-ui-express");
 const userRoutes = require('./routes/userRoutes')
 
-dotenv.config();
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 const app = express();
 app.use(bodyParser.json());
 
 // Connect to MongoDB
+if (process.env.NODE_ENV !== "test")
 connectDB();
 
 

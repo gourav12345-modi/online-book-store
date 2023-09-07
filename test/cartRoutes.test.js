@@ -4,15 +4,15 @@ const jwt = require('jsonwebtoken')
 const { MongoMemoryServer } = require('mongodb-memory-server')
 const mongoose = require('mongoose');
 const app = require('../app');
-
-const expect = chai.expect;
 const Cart = require('../models/Cart');
 const User = require('../models/User');
 const Book = require('../models/Book')
 
+const expect = chai.expect;
+
 chai.use(chaiHttp);
 
-describe('Cart', () => {
+describe('Cart Routes', () => {
   let con, mongoServer, token, newBook, newUser, newCart;
 
   // Connect to the test database before running tests
@@ -41,7 +41,6 @@ describe('Cart', () => {
       await mongoServer.stop()
     }
   });
-
 
   // Create book and cart before each testcase
   beforeEach(async () => {
@@ -190,10 +189,10 @@ describe('Cart', () => {
       .set('Authorization', `Bearer ${token}`)
       .end((err, res) => {
         expect(res).to.have.status(200);
-        expect(res.body).to.have.property('cart').that.is.an('array').lengthOf(1);
+        expect(res.body).to.have.property('items').that.is.an('array').lengthOf(1);
         expect(res.body).to.have.property('totalPrice').equals(39.98)
         
-        const { book, quantity } = res.body.cart[0];
+        const { book, quantity } = res.body.items[0];
         expect(quantity).to.equal(2)
         expect(book.title).to.equal(newBook.title)
         expect(book.author).to.equal(newBook.author)

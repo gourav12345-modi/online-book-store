@@ -110,7 +110,7 @@ exports.viewCart = async (req, res, next) => {
     // Calculate the total price using the virtual method
     const totalPrice = cart.totalPrice;
 
-    res.json({ cart: cart.items, totalPrice });
+    res.json({ items: cart.items, totalPrice });
   } catch (error) {
     next(error)
   }

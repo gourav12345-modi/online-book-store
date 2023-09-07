@@ -1,0 +1,66 @@
+paths:
+  /api/orders:
+    post:
+      summary: Place an order
+      tags:
+        - Orders
+      security:
+        - BearerAuth: []
+      responses:
+        '201':
+          description: Order placed successfully
+        '400':
+          description: Bad request; invalid data
+        '404':
+          description: Cart not found or user not found
+        '500':
+          description: Internal Server Error
+
+    get:
+      summary: Get user's order history
+      tags:
+        - Orders
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A list of user's orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
+
+components:
+  schemas:
+    Order:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Unique order ID.
+        userId:
+          type: string
+          description: Unique user ID who placed the order.
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              book:
+                $ref: '#/components/schemas/Book'
+              quantity:
+                type: integer
+                description: Quantity of the book in the order.
+        totalPrice:
+          type: number
+          description: Total price of the order.
+        createdAt:
+          type: string
+          format: date-time
+          description: Date and time when the order was placed.

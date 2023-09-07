@@ -79,7 +79,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  cart:
+                  items:
                     type: array
                     items:
                       type: object

@@ -30,7 +30,7 @@ describe('User Routes', () => {
   });
 
   // Test user registration
-  describe('/POST /api/users/register', () => {
+  describe('POST /api/users/register', () => {
     it('should register a new user', (done) => {
       chai
         .request(app)
@@ -57,7 +57,7 @@ describe('User Routes', () => {
   });
 
   // Test user login
-  describe('/POST /api/users/login', () => {
+  describe('POST /api/users/login', () => {
     it('should log in a user and return a JWT token', (done) => {
       chai
         .request(app)
@@ -96,7 +96,7 @@ describe('User Routes', () => {
   });
 
   // Test user logout
-  describe('/POST /api/users/logout', () => {
+  describe('POST /api/users/logout', () => {
     it('should log out a user', (done) => {
       chai
         .request(app)

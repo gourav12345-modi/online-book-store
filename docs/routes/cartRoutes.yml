@@ -1,0 +1,96 @@
+paths:
+  /api/cart/add:
+    post:
+      summary: Add a book to the user's cart
+      tags:
+        - Cart
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: JSON object containing the book ID and quantity
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bookId:
+                  type: string
+                quantity:
+                  type: integer
+              required:
+                - bookId
+                - quantity
+      responses:
+        '201':
+          description: Book added to cart successfully
+        '400':
+          description: Bad request; invalid data or quantity exceeds availability
+        '404':
+          description: Book not found or user not found
+        '500':
+          description: Internal Server Error
+
+  /api/cart/remove/{bookId}:
+    delete:
+      summary: Remove a specific quantity of a book from the user's cart
+      tags:
+        - Cart
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: bookId
+          schema:
+            type: string
+          required: true
+          description: The ID of the book to remove from the cart
+      requestBody:
+        description: JSON object containing the quantity to remove (default is 1)
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+      responses:
+        '204':
+          description: Book removed from the cart successfully
+        '400':
+          description: Bad request; invalid data or quantity exceeds cart quantity
+        '404':
+          description: Book not found in cart or user not found
+        '500':
+          description: Internal Server Error
+
+  /api/cart:
+    get:
+      summary: Get the user's cart
+      tags:
+        - Cart
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A JSON object containing the user's cart items and total price
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cart:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        book:
+                          $ref: '#/components/schemas/Book'
+                        quantity:
+                          type: integer
+                  totalPrice:
+                    type: number
+        '404':
+          description: Cart not found or user not found
+        '500':
+          description: Internal Server Error

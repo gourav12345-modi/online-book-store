@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 // Function to register a new user
-async function register(req, res, next) {
+exports.register = async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
@@ -28,7 +28,7 @@ async function register(req, res, next) {
 }
 
 // Function to log in a user and generate a JWT token
-async function login(req, res, next) {
+exports.login = async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
@@ -56,12 +56,6 @@ async function login(req, res, next) {
 }
 
 // Function to log out a user
-function logout(req, res) {
+exports.logout = (req, res) => {
   res.status(200).json({ message: 'User logged out' });
 }
-
-module.exports = {
-  register,
-  login,
-  logout,
-};

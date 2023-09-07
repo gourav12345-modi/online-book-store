@@ -1,0 +1,349 @@
+
+components:
+  schemas:
+    Rating:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: ID of the user who rated the book.
+        rating:
+          type: number
+          description: User's rating for the book (e.g., 1 to 5 stars).
+      example:
+        userId: 5f8aaff3b7f38b1a3f32a03e
+        rating: 4
+    Review:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: ID of the user who wrote the review.
+        text:
+          type: string
+          description: User's review text.
+      example:
+        userId: 5f8aaff3b7f38b1a3f32a03e
+        text: "Great book!"
+  
+    Book:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Unique book ID.
+        title:
+          type: string
+          description: Title of the book.
+        author:
+          type: string
+          description: Author of the book.
+        genre:
+          type: string,
+          description: Genre of the book.
+        price:
+          type: number
+          description: Price of the book.
+        availability:
+          type: integer
+          description: Availability of the book.
+      example:
+        _id: 60d25d58b07f8140a0744c9c
+        title: "Sample Book"
+        author: "John Doe"
+        genre: "Action"
+        price: 19.99
+        availability: 30
+  
+    BookWithFeedBack:
+      allOf:
+        - $ref: '#/components/schemas/Book'
+        - properties:
+            ratings:
+              type: array
+              items:
+                $ref: '#/components/schemas/Rating'
+            reviews:
+              type: array
+              items:
+                $ref: '#/components/schemas/Review'
+      example:
+        _id: 60d25d58b07f8140a0744c9c
+        title: "Sample Book"
+        author: "John Doe"
+        genre: "Action"
+        price: 19.99
+        availability: 30
+        ratings:
+          - userId: 5f8aaff3b7f38b1a3f32a03e
+            rating: 4
+          - userId: 5f8aaff3b7f38b1a3f32a03f
+            rating: 5
+        reviews:
+          - userId: 5f8aaff3b7f38b1a3f32a03e
+            text: "Great book!"
+          - userId: 5f8aaff3b7f38b1a3f32a03f
+            text: "I enjoyed reading this book."
+
+tags:
+  - name: Books
+    description: Book-related operations
+
+/api/books:
+  get:
+    summary: Get a paginated and sorted list of books.
+    tags:
+      - Books
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          minimum: 1
+        description: Page number for pagination.
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          minimum: 1
+        description: Number of books per page.
+      - in: query
+        name: sortBy
+        schema:
+          type: string
+        description: Sort books by "title," "author," "price," "genre," "availability" "createdAt," "updatedAt,".
+    responses:
+      200:
+        description: A paginated and sorted list of books.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/BookWithFeedBack'
+  post:
+    summary: Create a new book.
+    tags:
+      - Books
+    security:
+        - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                description: Title of the new book.
+                required: true
+              author:
+                type: string
+                description: Author of the new book.
+                required: true
+              price:
+                type: number
+                description: Price of the new book.
+                required: true
+              genre:
+                type: string
+                description: Genre of the book.
+              availability:
+                type: integer
+                description: Availability of the new book.
+    responses:
+      201:
+        description: Book created successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookWithFeedBack'
+
+/api/books/{id}:
+  get:
+    summary: Get detailed information about a specific book by ID.
+    tags:
+      - Books
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        description: Unique ID of the book to retrieve.
+        required: true
+    responses:
+      200:
+        description: Detailed information about the book.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookWithFeedBack'
+  put:
+    summary: Update a book by ID.
+    tags:
+      - Books
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        description: Unique ID of the book to update.
+        required: true
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                description: New title of the book.
+              author:
+                type: string
+                description: New author of the book.
+              price:
+                type: number
+                description: New price of the book.
+              genre:
+                type: string
+                description: Genre of the book.
+              availability:
+                type: integer
+                description: New availability of the book.
+    responses:
+      200:
+        description: Book updated successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookWithFeedBack'
+      404:
+        description: Book not found.
+      500:
+        description: Internal server error.
+
+  delete:
+    summary: Delete a book by ID.
+    tags:
+      - Books
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        description: Unique ID of the book to delete.
+        required: true
+    responses:
+      204:
+        description: Book deleted successfully.
+      404:
+        description: Book not found.
+      500:
+        description: Internal server error.
+
+
+
+/api/books/search:
+  get:
+    summary: Search for books by title or author.
+    tags:
+      - Books
+    parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        description: Search query for title or author.
+        required: true
+    responses:
+      200:
+        description: List of books matching the search query.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/BookWithFeedBack'
+
+
+
+/api/books/{id}/rate-review:
+  post:
+    summary: Add a user's rating and review for a book.
+    tags:
+      - Books
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        description: Unique ID of the book to rate and review.
+        required: true
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              rating:
+                type: number
+                description: User's rating for the book (e.g., 1 to 5 stars).
+              reviewText:
+                type: string
+                description: User's review text.
+    responses:
+      200:
+        description: Rating and review added successfully.
+
+  get:
+    summary: Retrieve ratings and reviews for a book.
+    tags:
+      - Books
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        description: Unique ID of the book to retrieve ratings and reviews for.
+        required: true
+    responses:
+      200:
+        description: Ratings and reviews for the book.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ratings:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+                        description: ID of the user who rated the book.
+                      rating:
+                        type: number
+                        description: User's rating for the book (e.g., 1 to 5 stars).
+                reviews:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+                        description: ID of the user who wrote the review.
+                      text:
+                        type: string
+                        description: User's review text.
+
+
